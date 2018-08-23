@@ -1,0 +1,72 @@
+{
+  "name": "@sagacify/autoroute",
+  "version": "1.0.0",
+  "description": "Automatic router for simple REST json api",
+  "main": "lib/Autoroute.js",
+  "directories": {
+    "lib": "lib",
+    "test": "tests"
+  },
+  "scripts": {
+    "format": "semistandard --fix",
+    "test": "mocha --reporter dot **/*.spec.js",
+    "test:lint": "semistandard --verbose | snazzy",
+    "test:cover": "nyc --reporter=text-summary --reporter=html npm test",
+    "test:coveralls": "nyc --reporter=text-lcov npm test | coveralls",
+    "test:all": "npm run test:lint && npm run test:cover"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Sagacify/autoroute.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Sagacify/autoroute/issues"
+  },
+  "homepage": "https://github.com/Sagacify/autoroute#readme",
+  "keywords": [
+    "api",
+    "automatic",
+    "express",
+    "json",
+    "rest",
+    "router",
+    "routing"
+  ],
+  "author": "@oliviercuyp",
+  "contributors": [
+    "François Beuvens <francois@sagacify.com>",
+    "Nicolas Vrielynck <nicolas@sagacify.com>",
+    "Quentin Gusbin <quentin@sagacify.com>"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "coveralls": "^3.0.2",
+    "express": "^4.16.3",
+    "mocha": "^5.2.0",
+    "nyc": "^12.0.2",
+    "snazzy": "^7.1.1"
+  },
+  "dependencies": {
+    "lodash": "^4.17.10",
+    "to-slug-case": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=8.3"
+  },
+  "nyc": {
+    "include": [
+      "lib/**/*.js"
+    ]
+  },
+  "semistandard": {
+    "globals": [
+      "describe",
+      "it",
+      "before",
+      "after",
+      "beforeEach",
+      "afterEach"
+    ]
+  }
+}
