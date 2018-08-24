@@ -43,10 +43,10 @@ jobs:
           at: ~/repo
       - run:
           name: Authenticate on npm registry
-          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+          command: echo -e "$NPM_USERNAME\n$NPM_PASSWORD\n$NPM_EMAIL" | npm login
       - run:
           name: Publish on npm registry
-          command: npm publish
+          command: npm publish --access=public
 
 workflows:
   version: 2
