@@ -36,7 +36,7 @@ const autoroute = new Autoroute(
   // Mapping between controller actions & http verbs
   {
     exists: 'head',
-    get: 'read',
+    read: 'get',
     create: 'post',
     update: 'put',
     partial: 'patch',
@@ -60,9 +60,9 @@ With this mapping Autoroute will look up for corresponding controller actions an
 
 ```js
   // Here we add req.user in meta parameter of controller actions methods
-  const authRouter = autoroute.createRouter(path.join(__dirname), 'controllers/auth', [ 'user' ]);
-  const v1ApiRouter = autoroute.createRouter(path.join(__dirname), 'controllers/v1');
-  const v2ApiRouter = autoroute.createRouter(path.join(__dirname), 'controllers/v2');
+  const authRouter = autoroute.createRouter(path.join(__dirname, 'controllers/auth'), [ 'user' ]);
+  const v1ApiRouter = autoroute.createRouter(path.join(__dirname, 'controllers/v1'));
+  const v2ApiRouter = autoroute.createRouter(path.join(__dirname, 'controllers/v2'));
 
   const app = express();
 
@@ -81,12 +81,12 @@ Exemple of controller implementation :
 
 ```js
 module.exports = {
-  exists: (params, meta) => { /* ... */ },
-  read: (params, meta) => { /* ... */ },
-  create: (params, meta) => { /* ... */ },
-  update: (params, meta) => { /* ... */ },
-  partial: (params, meta) => { /* ... */ },
-  destroy: (params, meta) => { /* ... */ },
+  exists: async (params, meta) => { /* ... */ },
+  read: async (params, meta) => { /* ... */ },
+  create: async (params, meta) => { /* ... */ },
+  update: async (params, meta) => { /* ... */ },
+  partial: async (params, meta) => { /* ... */ },
+  destroy: async (params, meta) => { /* ... */ },
   // This won't be mapped to a route
   internal: () => { /* ... */ }
 };
