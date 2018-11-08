@@ -20,9 +20,9 @@ $ npm install @sagacify/autoroute
 ### Import in your project
 ```js
 // require Autoroute
-const { Autoroute } = require('autoroute');
+const { Autoroute } = require('@sagacify/autoroute');
 // import Autoroute
-import { Autoroute } from 'autoroute';
+import { Autoroute } from '@sagacify/autoroute';
 ```
 
 ### Create an instance
@@ -98,7 +98,9 @@ While `meta` will contains other `req` properties if specified in `createRouter`
 `meta` will contain `req.user` here:
 
 ```js
-const authRouter = autoroute.createRouter(path.join(__dirname), 'controllers/auth', [ 'user' ]);`
+const authRouter = autoroute.createRouter(
+  path.join(__dirname, 'controllers/auth'), [ 'user' ]
+);
 ```
 
 ## Npm scripts
