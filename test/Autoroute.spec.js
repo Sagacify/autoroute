@@ -1,5 +1,5 @@
 const expect = require('chai').expect;
-const { Autoroute } = require('../lib/Autoroute');
+const { Autoroute } = require('../src/Autoroute');
 const { Router } = require('express');
 const path = require('path');
 
