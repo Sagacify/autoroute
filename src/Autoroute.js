@@ -5,9 +5,14 @@ const fs = require('fs');
 const path = require('path');
 
 class Autoroute {
-  constructor (Router, actionsMap) {
+  constructor (Router, actionsMap, {
+    onRequest = () => {},
+    onResponse = () => {}
+  } = {}) {
     this.Router = Router;
     this.actionsMap = actionsMap;
+    this.onRequest = onRequest;
+    this.onResponse = onResponse;
   }
 
   routeFromPath (basePath, filePath) {
@@ -48,10 +53,10 @@ class Autoroute {
 
   createRouteHandler (controller, action, metaList) {
     return async (req, res, next) => {
-      const options = Object.assign({}, req.query, req.body, req.params);
+      const params = Object.assign({}, req.query, req.body, req.params);
 
       if (_.has(req, 'files.data')) {
-        options.files = req.files;
+        params.files = req.files;
       }
 
       const meta = _.reduce(req, (result, value, key) => {
@@ -64,7 +69,24 @@ class Autoroute {
       }, {});
 
       try {
-        const result = await controller[action](options, meta);
+        this.onRequest({
+          originalUrl: req.originalUrl,
+          action,
+          params,
+          meta
+        });
+        const result = await controller[action](params, meta, {
+          originalUrl: req.originalUrl,
+          action: action
+        });
+        this.onResponse({
+          originalUrl: req.originalUrl,
+          action,
+          params,
+          meta,
+          result
+        });
+
         res.json(result);
       } catch (e) {
         return next(e);
