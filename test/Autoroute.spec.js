@@ -39,11 +39,46 @@ describe('Autoroute', () => {
 
   it('should create route handler', () => {
     const controller = {
-      create: (options, meta) => {}
+      create: (params, meta) => {}
     };
 
-    const handler = autoroute.createRouteHandler(controller, 'create');
+    const handler = autoroute.createRouteHandler(controller, 'create', []);
     expect(handler).to.be.a('function');
+  });
+
+  it('should handle hooks in route handler', async () => {
+    let resquestData, responseData;
+    const hookedAutoroute = new Autoroute(Router, actionsMap, {
+      onRequest: (params) => { resquestData = params; },
+      onResponse: (params) => { responseData = params; }
+    });
+    const controller = {
+      create: (params, meta) => 'all done'
+    };
+
+    const handler = await hookedAutoroute.createRouteHandler(
+      controller, 'create', []
+    );
+    await handler(
+      { originalUrl: '/test', query: { test: 'test' }, body: {}, params: {} }, // req
+      {}, // res
+      () => {} // next
+    );
+
+    expect([resquestData, responseData]).to.deep.equal([
+      {
+        originalUrl: '/test',
+        action: 'create',
+        params: { test: 'test' },
+        meta: {}
+      }, {
+        originalUrl: '/test',
+        action: 'create',
+        params: { test: 'test' },
+        meta: {},
+        result: 'all done'
+      }
+    ]);
   });
 
   it('should register the controller in the router', () => {
@@ -63,8 +98,11 @@ describe('Autoroute', () => {
       { path: '/test', methods: { get: true } },
       { path: '/test/:id', methods: { get: true } },
       { path: '/test', methods: { post: true } },
+      { path: '/test', methods: { put: true } },
       { path: '/test/:id', methods: { put: true } },
+      { path: '/test', methods: { patch: true } },
       { path: '/test/:id', methods: { patch: true } },
+      { path: '/test', methods: { delete: true } },
       { path: '/test/:id', methods: { delete: true } }
     ]);
   });
@@ -82,24 +120,33 @@ describe('Autoroute', () => {
       { path: '/sub-path/sub-test', methods: { get: true } },
       { path: '/sub-path/sub-test/:id', methods: { get: true } },
       { path: '/sub-path/sub-test', methods: { post: true } },
+      { path: '/sub-path/sub-test', methods: { put: true } },
       { path: '/sub-path/sub-test/:id', methods: { put: true } },
+      { path: '/sub-path/sub-test', methods: { patch: true } },
       { path: '/sub-path/sub-test/:id', methods: { patch: true } },
+      { path: '/sub-path/sub-test', methods: { delete: true } },
       { path: '/sub-path/sub-test/:id', methods: { delete: true } },
       { path: '/', methods: { head: true } },
       { path: '/:id', methods: { head: true } },
       { path: '/', methods: { get: true } },
       { path: '/:id', methods: { get: true } },
       { path: '/', methods: { post: true } },
+      { path: '/', methods: { put: true } },
       { path: '/:id', methods: { put: true } },
+      { path: '/', methods: { patch: true } },
       { path: '/:id', methods: { patch: true } },
+      { path: '/', methods: { delete: true } },
       { path: '/:id', methods: { delete: true } },
       { path: '/test', methods: { head: true } },
       { path: '/test/:id', methods: { head: true } },
       { path: '/test', methods: { get: true } },
       { path: '/test/:id', methods: { get: true } },
       { path: '/test', methods: { post: true } },
+      { path: '/test', methods: { put: true } },
       { path: '/test/:id', methods: { put: true } },
+      { path: '/test', methods: { patch: true } },
       { path: '/test/:id', methods: { patch: true } },
+      { path: '/test', methods: { delete: true } },
       { path: '/test/:id', methods: { delete: true } }
     ]);
   });

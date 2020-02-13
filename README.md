@@ -41,6 +41,13 @@ const autoroute = new Autoroute(
     update: 'put',
     partial: 'patch',
     destroy: 'delete'
+  },
+  // Hooks
+  {
+    onRequest: ({originalUrl, action, params, meta}) =>
+      console.log({originalUrl, action, params, meta})
+    onResponse: ({originalUrl, action, params, meta, result}) =>
+      console.log({originalUrl, action, params, meta, result})
   }
 );
 ```
@@ -52,8 +59,11 @@ With this mapping Autoroute will look up for corresponding controller actions an
 - **GET** `/my-controller` will call myController.read(params, meta)
 - **GET** `/my-controller/:id` will call myController.read(params, meta)
 - **POST** `/my-controller` will call myController.create(params, meta)
+- **PUT** `/my-controller` will call myController.update(params, meta)
 - **PUT** `/my-controller/:id` will call myController.update(params, meta)
+- **PATCH** `/my-controller` will call myController.partial(params, meta)
 - **PATCH** `/my-controller/:id` will call myController.partial(params, meta)
+- **DELETE** `/my-controller` will call myController.destroy(params, meta)
 - **DELETE** `/my-controller/:id` will call myController.destroy(params, meta)
 
 ### Create routers
