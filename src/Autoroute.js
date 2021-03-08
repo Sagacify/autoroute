@@ -88,6 +88,8 @@ class Autoroute {
         });
 
         res.json(result);
+
+        next();
       } catch (e) {
         return next(e);
       }
