@@ -1,6 +1,6 @@
 {
   "name": "@sagacify/autoroute",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Automatic router for simple REST json api",
   "main": "src/Autoroute.js",
   "directories": {
