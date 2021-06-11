@@ -1,16 +1,19 @@
 const _ = require('lodash');
+const glob = require('glob');
 // Not using lodash kebabCase since it transaform 'v1' to 'v-1'
 const toSlubCase = require('to-slug-case');
-const fs = require('fs');
-const path = require('path');
 
 class Autoroute {
   constructor (Router, actionsMap, {
+    pattern = '**/*.js',
+    ignore = [],
     onRequest = () => {},
     onResponse = () => {}
   } = {}) {
     this.Router = Router;
     this.actionsMap = actionsMap;
+    this.pattern = pattern;
+    this.ignore = ignore;
     this.onRequest = onRequest;
     this.onResponse = onResponse;
   }
@@ -27,28 +30,11 @@ class Autoroute {
   }
 
   findControllers (basePath) {
-    const files = fs.readdirSync(basePath);
-    const controllerFiles = [];
-
-    files.forEach((file) => {
-      // Skip ., .., .something_hidden
-      if (file[0] === '.') {
-        return;
-      }
-
-      const fullPath = path.join(basePath, file);
-      const stats = fs.statSync(fullPath);
-
-      if (stats.isDirectory()) {
-        controllerFiles.push(...this.findControllers(fullPath));
-      }
-
-      if (path.extname(file) === '.js') {
-        controllerFiles.push(fullPath);
-      }
+    return glob.sync(this.pattern, {
+      cwd: basePath,
+      ignore: this.ignore,
+      absolute: true
     });
-    // Important to have the files from directories first for routing
-    return controllerFiles;
   }
 
   createRouteHandler (controller, action, metaList) {
@@ -77,7 +63,7 @@ class Autoroute {
         });
         const result = await controller[action](params, meta, {
           originalUrl: req.originalUrl,
-          action: action
+          action
         });
         this.onResponse({
           originalUrl: req.originalUrl,
@@ -105,7 +91,7 @@ class Autoroute {
 
       if (['head', 'get', 'put', 'delete', 'patch'].includes(verb)) {
         // Need to define 2 routes ('/resource' & '/resource/:id')
-        finalRoutes = [baseRoute, baseRoute.replace(/\/$/, '') + '/:id'];
+        finalRoutes = [baseRoute, `${baseRoute.replace(/\/$/, '')}/:id`];
       } else {
         // For the post verb
         finalRoutes = [baseRoute];
