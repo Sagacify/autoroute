@@ -1,4 +1,4 @@
-const expect = require('chai').expect;
+const { expect } = require('chai');
 const { Autoroute } = require('../src/Autoroute');
 const { Router } = require('express');
 const path = require('path');
@@ -31,6 +31,19 @@ describe('Autoroute', () => {
 
   it('should find controllers in the base path', () => {
     expect(autoroute.findControllers(basePath)).to.have.members([
+      path.join(basePath, '/index.js'),
+      path.join(basePath, '/test.js'),
+      path.join(basePath, '/subPath/subTest.js'),
+      path.join(basePath, '/subPath/subTest.spec.js')
+    ]);
+  });
+
+  it('should ignore files matching pattern ignore option', () => {
+    const autoroute2 = new Autoroute(Router, actionsMap, {
+      ignore: ['**/*.spec.js']
+    });
+
+    expect(autoroute2.findControllers(basePath)).to.have.members([
       path.join(basePath, '/index.js'),
       path.join(basePath, '/test.js'),
       path.join(basePath, '/subPath/subTest.js')

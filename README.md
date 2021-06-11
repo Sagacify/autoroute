@@ -18,6 +18,7 @@ $ npm install @sagacify/autoroute
 ## Usage
 
 ### Import in your project
+
 ```js
 // require Autoroute
 const { Autoroute } = require('@sagacify/autoroute');
@@ -44,10 +45,10 @@ const autoroute = new Autoroute(
   },
   // Hooks
   {
-    onRequest: ({originalUrl, action, params, meta}) =>
-      console.log({originalUrl, action, params, meta})
-    onResponse: ({originalUrl, action, params, meta, result}) =>
-      console.log({originalUrl, action, params, meta, result})
+    onRequest: ({ originalUrl, action, params, meta }) =>
+      console.log({ originalUrl, action, params, meta })
+    onResponse: ({ originalUrl, action, params, meta, result }) =>
+      console.log({ originalUrl, action, params, meta, result })
   }
 );
 ```
@@ -65,6 +66,13 @@ With this mapping Autoroute will look up for corresponding controller actions an
 - **PATCH** `/my-controller/:id` will call myController.partial(params, meta)
 - **DELETE** `/my-controller` will call myController.destroy(params, meta)
 - **DELETE** `/my-controller/:id` will call myController.destroy(params, meta)
+
+#### Options
+
+- `pattern` (default: `'**/*.js'`) controller file pattern to require, see: [glob](https://www.npmjs.com/package/glob)
+- `ignore` (default: `[]`) file pattern to ignore, useful to ignore '**/*.spec.js', see: [glob](https://www.npmjs.com/package/glob)
+- `onRequest` (default: `() => {}`) hook called on request with these arguments `{ originalUrl, action, params, meta }`
+- `onResponse` (default: `() => {}`) hook called on response with these arguments `{ originalUrl, action, params, meta }`
 
 ### Create routers
 
@@ -124,7 +132,7 @@ $ npm run format
 ### Running tests
 
 ```sh
-$ npm test
+$ npm test:spec
 ```
 
 ### Running lint tests
@@ -144,7 +152,7 @@ This will create a coverage folder with all the report in `coverage/index.html`
 ### Running all tests
 
 ```sh
-$ npm test:all
+$ npm test
 ```
 
 *Note: that's the one you want to use most of the time*
