@@ -4,6 +4,8 @@ const toSlubCase = require('to-slug-case');
 const fs = require('fs');
 const path = require('path');
 
+const jsExts = ['.js', '.cjs', '.mjs'];
+
 class Autoroute {
   constructor (Router, actionsMap, {
     onRequest = () => {},
@@ -16,10 +18,15 @@ class Autoroute {
   }
 
   routeFromPath (basePath, filePath) {
+    const exts = jsExts
+      .map(jsExt => `\\${jsExt}`)
+      .join('|');
+    const replaceRegExp = new RegExp(`(/index)?(${exts})$`, 'i');
+
     return (
       filePath
         .substr(basePath.length)
-        .replace(/(\/index)?\.js$/i, '')
+        .replace(replaceRegExp, '')
         .split('/')
         .map(toSlubCase)
         .join('/') || '/'
@@ -43,7 +50,7 @@ class Autoroute {
         controllerFiles.push(...this.findControllers(fullPath));
       }
 
-      if (path.extname(file) === '.js') {
+      if (jsExts.includes(path.extname(file))) {
         controllerFiles.push(fullPath);
       }
     });
