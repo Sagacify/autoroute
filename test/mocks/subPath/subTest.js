@@ -5,5 +5,7 @@ module.exports = {
   update: (params, meta) => ({ params, meta }),
   partial: (params, meta) => ({ params, meta }),
   destroy: (params, meta) => ({ params, meta }),
-  internal: () => {}
+  internal: () => {
+    // Do nothing
+  }
 };

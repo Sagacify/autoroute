@@ -1,11 +1,11 @@
-const { expect } = require('chai');
-const { Autoroute } = require('../src/Autoroute');
-const { Router } = require('express');
-const path = require('path');
+import { expect } from 'chai';
+import { Autoroute, ActionsMap } from '../src/Autoroute';
+import { Router } from 'express';
+import path from 'path';
 
 describe('Autoroute', () => {
   const basePath = path.join(__dirname, './mocks');
-  const actionsMap = {
+  const actionsMap: ActionsMap = {
     exists: 'head',
     read: 'get',
     create: 'post',
@@ -31,28 +31,32 @@ describe('Autoroute', () => {
 
   it('should find controllers in the base path', () => {
     expect(autoroute.findControllers(basePath)).to.have.members([
-      path.join(basePath, '/index.js'),
-      path.join(basePath, '/test.js'),
+      path.join(basePath, '/index.ts'),
+      path.join(basePath, '/test.ts'),
+      path.join(basePath, '/subPath/subTest.ts'),
       path.join(basePath, '/subPath/subTest.js'),
-      path.join(basePath, '/subPath/subTest.spec.js')
+      path.join(basePath, '/subPath/subTest.spec.ts')
     ]);
   });
 
   it('should ignore files matching pattern ignore option', () => {
     const autoroute2 = new Autoroute(Router, actionsMap, {
-      ignore: ['**/*.spec.js']
+      ignore: ['**/*.spec.ts']
     });
 
     expect(autoroute2.findControllers(basePath)).to.have.members([
-      path.join(basePath, '/index.js'),
-      path.join(basePath, '/test.js'),
-      path.join(basePath, '/subPath/subTest.js')
+      path.join(basePath, '/index.ts'),
+      path.join(basePath, '/test.ts'),
+      path.join(basePath, '/subPath/subTest.js'),
+      path.join(basePath, '/subPath/subTest.ts')
     ]);
   });
 
   it('should create route handler', () => {
     const controller = {
-      create: (params, meta) => {}
+      create: () => {
+        // Do nothing
+      }
     };
 
     const handler = autoroute.createRouteHandler(controller, 'create', []);
@@ -62,20 +66,33 @@ describe('Autoroute', () => {
   it('should handle hooks in route handler', async () => {
     let resquestData, responseData;
     const hookedAutoroute = new Autoroute(Router, actionsMap, {
-      onRequest: (params) => { resquestData = params; },
-      onResponse: (params) => { responseData = params; }
+      onRequest: (params) => {
+        resquestData = params;
+      },
+      onResponse: (params) => {
+        responseData = params;
+      }
     });
     const controller = {
-      create: (params, meta) => 'all done'
+      create: () => 'all done'
     };
 
     const handler = await hookedAutoroute.createRouteHandler(
-      controller, 'create', []
+      controller,
+      'create',
+      []
     );
     await handler(
-      { originalUrl: '/test', query: { test: 'test' }, body: {}, params: {} }, // req
-      {}, // res
-      () => {} // next
+      {
+        originalUrl: '/test',
+        query: { test: 'test' },
+        body: {},
+        params: {}
+      } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
+      {} as any, // eslint-disable-line @typescript-eslint/no-explicit-any
+      () => {
+        // next
+      }
     );
 
     expect([resquestData, responseData]).to.deep.equal([
@@ -84,7 +101,8 @@ describe('Autoroute', () => {
         action: 'create',
         params: { test: 'test' },
         meta: {}
-      }, {
+      },
+      {
         originalUrl: '/test',
         action: 'create',
         params: { test: 'test' },
@@ -94,13 +112,27 @@ describe('Autoroute', () => {
     ]);
   });
 
-  it('should register the controller in the router', () => {
-    const router = new Router();
-    const controller = require('./mocks/test.js');
+  it('should prefer js in case of duplicate controllers', async () => {
+    const results = autoroute.getUniqValidControllerPaths([
+      '/controllers/myController.ts',
+      '/controllers/myController.js',
+      '/controllers/someEntity/myController.ts'
+    ]);
+
+    expect(results).to.deep.equal([
+      '/controllers/someEntity/myController.ts',
+      '/controllers/myController.js'
+    ]);
+  });
+
+  it('should register the controller in the router', async () => {
+    const router: Router = Router();
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const controller = require('./mocks/test');
 
     autoroute.registerController(router, '/test', controller);
 
-    const routes = router.stack.map(layer => ({
+    const routes = router.stack.map((layer) => ({
       path: layer.route.path,
       methods: layer.route.methods
     }));
@@ -120,13 +152,14 @@ describe('Autoroute', () => {
     ]);
   });
 
-  it('should create a new router with routes ordered by length', () => {
+  it("should create a new router with routes ordered by segment's length", () => {
     const router = autoroute.createRouter(path.join(__dirname, './mocks'));
-    const routes = router.stack.map(layer => ({
+    const routes = router.stack.map((layer) => ({
       path: layer.route.path,
       methods: layer.route.methods
     }));
-    // Should be sorted by the more
+
+    // Should be sorted by longest/most-specific route first
     expect(routes).to.deep.equal([
       { path: '/sub-path/sub-test', methods: { head: true } },
       { path: '/sub-path/sub-test/:id', methods: { head: true } },
@@ -139,17 +172,6 @@ describe('Autoroute', () => {
       { path: '/sub-path/sub-test/:id', methods: { patch: true } },
       { path: '/sub-path/sub-test', methods: { delete: true } },
       { path: '/sub-path/sub-test/:id', methods: { delete: true } },
-      { path: '/', methods: { head: true } },
-      { path: '/:id', methods: { head: true } },
-      { path: '/', methods: { get: true } },
-      { path: '/:id', methods: { get: true } },
-      { path: '/', methods: { post: true } },
-      { path: '/', methods: { put: true } },
-      { path: '/:id', methods: { put: true } },
-      { path: '/', methods: { patch: true } },
-      { path: '/:id', methods: { patch: true } },
-      { path: '/', methods: { delete: true } },
-      { path: '/:id', methods: { delete: true } },
       { path: '/test', methods: { head: true } },
       { path: '/test/:id', methods: { head: true } },
       { path: '/test', methods: { get: true } },
@@ -160,7 +182,13 @@ describe('Autoroute', () => {
       { path: '/test', methods: { patch: true } },
       { path: '/test/:id', methods: { patch: true } },
       { path: '/test', methods: { delete: true } },
-      { path: '/test/:id', methods: { delete: true } }
+      { path: '/test/:id', methods: { delete: true } },
+      { path: '/', methods: { head: true } },
+      { path: '/', methods: { get: true } },
+      { path: '/', methods: { post: true } },
+      { path: '/', methods: { put: true } },
+      { path: '/', methods: { patch: true } },
+      { path: '/', methods: { delete: true } }
     ]);
   });
 });
