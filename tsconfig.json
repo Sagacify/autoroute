@@ -1,0 +1,52 @@
+{
+  "ts-node": {
+    "files": true,
+    // Skipping typechecking makes tests run faster
+    "transpileOnly": true
+  },
+  "compilerOptions": {
+    "declaration": true,
+    "outDir": "build",
+    "target": "ES2018",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "baseUrl": "./",
+    "allowJs": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "alwaysStrict": true,
+    "downlevelIteration": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": false,
+    "inlineSources": false,
+    "noEmitHelpers": false,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "removeComments": false,
+    "strict": true,
+    "strictFunctionTypes": false,
+    "strictPropertyInitialization": true,
+    "importsNotUsedAsValues": "remove",
+    "sourceMap": false,
+    "resolveJsonModule": true,
+    "types": [
+      "node",
+      "mocha"
+    ],
+    "lib": [
+      "ESNext",
+      "DOM"
+    ]
+  },
+  "include": [
+    "src/**/*.ts",
+    "test/**/*.ts",
+    "test/**/*.js"
+  ],
+  "compileOnSave": false,
+  "buildOnSave": false
+}

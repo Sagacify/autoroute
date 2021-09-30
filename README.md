@@ -19,21 +19,18 @@ $ npm install @sagacify/autoroute
 
 ### Import in your project
 
-```js
-// require Autoroute
-const { Autoroute } = require('@sagacify/autoroute');
-// import Autoroute
-import { Autoroute } from '@sagacify/autoroute';
-```
-
 ### Create an instance
 
 ```js
-const express = require('express');
+const { Autoroute } = require('@sagacify/autoroute');
+const { Router } = require('express');
+// OR
+import { Autoroute } from '@sagacify/autoroute';
+import { Router } from 'express';
 
 const autoroute = new Autoroute(
   // Router class
-  express.Router,
+  Router,
   // Mapping between controller actions & http verbs
   {
     exists: 'head',

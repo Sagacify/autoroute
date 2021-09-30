@@ -8,12 +8,14 @@
     "test": "test"
   },
   "scripts": {
-    "format": "semistandard --fix",
-    "test:spec": "NODE_ENV=test mocha --recursive",
-    "test:lint": "eslint -f stylish .",
-    "test:cover": "nyc --reporter=lcov --reporter=text-summary npm run test:spec",
-    "test:coveralls": "nyc npm test && nyc report --reporter=text-lcov | coveralls",
-    "test": "npm run test:lint && npm run test:cover"
+    "build": "tsc -p tsconfig.build.json",
+    "lint": "eslint --fix ./src ./test",
+    "test:lint": "eslint -f stylish ./src ./test",
+    "test:types": "tsc --noEmit --skipLibCheck",
+    "test:spec": "env NODE_ENV=test mocha .",
+    "test:cover": "nyc npm run test:spec",
+    "test:watch": "env NODE_ENV=test mocha --watch",
+    "test": "npm run test:lint && npm run test:types && npm run test:cover"
   },
   "repository": {
     "type": "git",
@@ -41,40 +43,95 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "glob": "^7.1.3",
+    "@types/to-slug-case": "^1.0.0",
+    "glob": "^7.2.0",
     "lodash": "^4.17.21",
     "to-slug-case": "^1.0.0"
   },
   "devDependencies": {
     "@sagacify/eslint-config": "^1.2.0",
+    "@types/chai": "^4.2.22",
+    "@types/express": "^4.17.13",
+    "@types/glob": "^7.1.4",
+    "@types/lodash": "^4.14.175",
+    "@types/mocha": "^9.0.0",
+    "@types/node": "^16.10.2",
+    "@typescript-eslint/eslint-plugin": "^4.32.0",
+    "@typescript-eslint/parser": "^4.32.0",
     "chai": "^4.3.4",
-    "coveralls": "^3.1.0",
-    "eslint": "^7.28.0",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-config-semistandard": "^16.0.0",
     "eslint-config-standard": "^16.0.3",
-    "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-import": "^2.24.2",
     "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-promise": "^5.1.0",
     "express": "^4.17.1",
-    "mocha": "^7.2.0",
-    "nyc": "^15.1.0"
+    "mocha": "^9.1.2",
+    "nyc": "^15.1.0",
+    "prettier": "^2.4.1",
+    "ts-node": "^10.2.1",
+    "typescript": "^4.4.3"
+  },
+  "peerDependencies": {
+    "express": "4.x"
   },
   "engines": {
-    "node": ">=8.3"
+    "node": ">=12.4.0"
+  },
+  "eslintConfig": {
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+      "@typescript-eslint",
+      "prettier"
+    ],
+    "extends": [
+      "semistandard",
+      "plugin:@typescript-eslint/eslint-recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:prettier/recommended"
+    ],
+    "env": {
+      "node": true,
+      "mocha": true
+    }
+  },
+  "mocha": {
+    "require": "ts-node/register",
+    "spec": [
+      "test/**/*.ts"
+    ],
+    "watch-files": [
+      "src/**/*.ts",
+      "test/**/*.ts"
+    ]
   },
   "nyc": {
     "check-coverage": true,
     "lines": 80,
     "include": [
-      "src/**/*.js"
+      "src/**/*.ts"
     ]
   },
-  "eslintConfig": {
-    "ignorePatterns": [
-      "src/docs/**/*"
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "none",
+    "bracketSpacing": true,
+    "semi": true,
+    "arrowParens": "always"
+  },
+  "release": {
+    "branches": [
+      "master"
     ],
-    "extends": [
-      "standard",
-      "@sagacify"
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/changelog",
+      "@semantic-release/npm",
+      "@semantic-release/git",
+      "@semantic-release/github"
     ]
   }
 }

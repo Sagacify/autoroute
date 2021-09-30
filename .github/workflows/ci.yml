@@ -1,0 +1,47 @@
+name: Continuous Integration
+on:
+  push:
+    branches:
+      - master
+      - dryrun-*
+  pull_request:
+    branches:
+      - '*'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate commit messages
+        if: ${{ github.ref != 'refs/heads/master' }}
+        uses: wagoid/commitlint-github-action@v3
+
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Install packages & build & run tests
+        run: |
+          npm ci
+          npm test
+      - name: Compile typescript
+        run: npm run build
+
+      - name: Semantic Release
+        id: semantic_release
+        if: ${{ github.ref == 'refs/heads/master' }}
+        uses: cycjimmy/semantic-release-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.SAGA_GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        with:
+          semantic_version: 17
+          extra_plugins: |
+            @semantic-release/changelog
+            @semantic-release/git
