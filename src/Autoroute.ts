@@ -22,15 +22,6 @@ type ControllerInfo = {
 
 type RouterFactory = typeof Express.Router;
 
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace Express {
-    interface Request {
-      files?: Record<string, unknown>;
-    }
-  }
-}
-
 interface OnRequestOptions {
   originalUrl: string;
   action: string;
@@ -47,6 +38,10 @@ interface AutorouteOptions {
   ignore: string[];
   onRequest(options: OnRequestOptions): void;
   onResponse(options: OnResponseOptions): void;
+}
+
+interface ExtendedRequest extends Express.Request {
+  [key: string]: any;
 }
 
 // Order define precedence
@@ -92,7 +87,7 @@ export class Autoroute {
 
     return (
       filePath
-        .substr(basePath.length)
+        .substring(basePath.length)
         .replace(replaceRegex, '')
         .split('/')
         .map(toSlubCase)
@@ -114,7 +109,7 @@ export class Autoroute {
     metaList: string[] = []
   ): Express.RequestHandler {
     return async (
-      req: Express.Request,
+      req: ExtendedRequest,
       res: Express.Response,
       next: Express.NextFunction
     ): Promise<void> => {
@@ -174,21 +169,14 @@ export class Autoroute {
       const verb = this.actionsMap[action];
       let finalRoutes;
 
-      if (
-        baseRoute !== '/' &&
-        ['head', 'get', 'put', 'delete', 'patch'].includes(verb)
-      ) {
+      if (baseRoute !== '/' && ['head', 'get', 'put', 'delete', 'patch'].includes(verb)) {
         // Need to define 2 routes ('/resource' & '/resource/:id')
         finalRoutes = [baseRoute, `${baseRoute.replace(/\/$/, '')}/:id`];
       } else {
         // For the post verb
         finalRoutes = [baseRoute];
       }
-      const routeHandler = this.createRouteHandler(
-        controller,
-        action,
-        metaList
-      );
+      const routeHandler = this.createRouteHandler(controller, action, metaList);
 
       // Assign routeHandler to routes
       finalRoutes.forEach((finalRoute) => {
@@ -210,21 +198,14 @@ export class Autoroute {
           ext: controllerParsedPath.ext
         };
       })
-      .filter(
-        (controllerPathInfo) => exts.indexOf(controllerPathInfo.ext) !== -1
-      )
+      .filter((controllerPathInfo) => exts.indexOf(controllerPathInfo.ext) !== -1)
       .sort((controllerPathInfoA, controllerPathInfoB) => {
         if (controllerPathInfoA.noExtPath < controllerPathInfoB.noExtPath) {
           return 1;
-        } else if (
-          controllerPathInfoA.noExtPath > controllerPathInfoB.noExtPath
-        ) {
+        } else if (controllerPathInfoA.noExtPath > controllerPathInfoB.noExtPath) {
           return -1;
         } else {
-          return (
-            exts.indexOf(controllerPathInfoA.ext) -
-            exts.indexOf(controllerPathInfoB.ext)
-          );
+          return exts.indexOf(controllerPathInfoA.ext) - exts.indexOf(controllerPathInfoB.ext);
         }
       })
       .filter((controllerPathInfo) => {
@@ -237,10 +218,7 @@ export class Autoroute {
       .map((controllerPathInfo) => controllerPathInfo.fullPath);
   }
 
-  createRouter(
-    controllersBasePath: string,
-    metaList: string[] = []
-  ): Express.Router {
+  createRouter(controllersBasePath: string, metaList: string[] = []): Express.Router {
     const controllerPaths = this.findControllers(controllersBasePath);
     const router = this.Router();
     // Need to sort to have longest/most-specific route first
@@ -262,12 +240,7 @@ export class Autoroute {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const controller = require(controllerInfo.path);
 
-        this.registerController(
-          router,
-          controllerInfo.route,
-          controller,
-          metaList
-        );
+        this.registerController(router, controllerInfo.route, controller, metaList);
       });
 
     return router;
