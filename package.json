@@ -9,8 +9,8 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "lint": "eslint --fix ./src ./test",
-    "test:lint": "eslint -f stylish ./src ./test",
+    "fix:lint": "eslint --fix ./src ./test",
+    "test:lint": "eslint -f stylish 'src/**/*.ts'",
     "test:types": "tsc --noEmit --skipLibCheck",
     "test:spec": "env NODE_ENV=test mocha .",
     "test:cover": "nyc npm run test:spec",
@@ -44,35 +44,34 @@
   "license": "MIT",
   "dependencies": {
     "@types/to-slug-case": "^1.0.0",
-    "glob": "^7.2.0",
+    "glob": "^8.0.3",
     "lodash": "^4.17.21",
     "to-slug-case": "^1.0.0"
   },
   "devDependencies": {
     "@sagacify/eslint-config": "^1.2.0",
-    "@types/chai": "^4.2.22",
+    "@types/chai": "^4.3.1",
     "@types/express": "^4.17.13",
-    "@types/glob": "^7.1.4",
-    "@types/lodash": "^4.14.175",
-    "@types/mocha": "^9.0.0",
-    "@types/node": "^16.10.2",
-    "@typescript-eslint/eslint-plugin": "^4.32.0",
-    "@typescript-eslint/parser": "^4.32.0",
-    "chai": "^4.3.4",
-    "eslint": "^7.32.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-config-semistandard": "^16.0.0",
-    "eslint-config-standard": "^16.0.3",
-    "eslint-plugin-import": "^2.24.2",
+    "@types/glob": "^7.2.0",
+    "@types/lodash": "^4.14.182",
+    "@types/mocha": "^9.1.1",
+    "@types/node": "^17.0.40",
+    "@typescript-eslint/eslint-plugin": "^5.27.0",
+    "@typescript-eslint/parser": "^5.27.0",
+    "chai": "^4.3.6",
+    "eslint": "^8.17.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "eslint-plugin-promise": "^5.1.0",
-    "express": "^4.17.1",
-    "mocha": "^9.1.2",
+    "eslint-plugin-promise": "^6.0.0",
+    "express": "^4.18.1",
+    "mocha": "^10.0.0",
     "nyc": "^15.1.0",
-    "prettier": "^2.4.1",
-    "ts-node": "^10.2.1",
-    "typescript": "^4.4.3"
+    "prettier": "^2.6.2",
+    "ts-node": "^10.8.1",
+    "typescript": "^4.7.3"
   },
   "peerDependencies": {
     "express": "4.x"
@@ -81,13 +80,18 @@
     "node": ">=12.4.0"
   },
   "eslintConfig": {
+    "ignorePatterns": [
+      "**/build/*.js"
+    ],
     "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "project": "./tsconfig.json"
+    },
     "plugins": [
       "@typescript-eslint",
       "prettier"
     ],
     "extends": [
-      "semistandard",
       "plugin:@typescript-eslint/eslint-recommended",
       "plugin:@typescript-eslint/recommended",
       "plugin:prettier/recommended"
@@ -96,6 +100,14 @@
       "node": true,
       "mocha": true
     }
+  },
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
+    "trailingComma": "none",
+    "bracketSpacing": true,
+    "semi": true,
+    "arrowParens": "always"
   },
   "mocha": {
     "require": "ts-node/register",
@@ -113,13 +125,6 @@
     "include": [
       "src/**/*.ts"
     ]
-  },
-  "prettier": {
-    "singleQuote": true,
-    "trailingComma": "none",
-    "bracketSpacing": true,
-    "semi": true,
-    "arrowParens": "always"
   },
   "release": {
     "branches": [
