@@ -1,9 +1,5 @@
 # Autoroute
-
-[![CircleCI](https://circleci.com/gh/Sagacify/autoroute.svg?style=svg)](https://circleci.com/gh/Sagacify/autoroute)
-[![Coverage Status](https://coveralls.io/repos/github/Sagacify/autoroute/badge.svg?branch=master)](https://coveralls.io/github/Sagacify/autoroute?branch=master)
 [![npm version](https://img.shields.io/npm/v/@sagacify/autoroute.svg)](https://www.npmjs.com/package/@sagacify/autoroute)
-[![Dependency Status](https://img.shields.io/david/Sagacify/autoroute.svg?style=flat-square)](https://david-dm.org/Sagacify/autoroute)
 
 Automatic router for simple REST json api
 
