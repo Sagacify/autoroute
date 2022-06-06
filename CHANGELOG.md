@@ -1,3 +1,10 @@
+## [2.0.2](https://github.com/Sagacify/autoroute/compare/v2.0.1...v2.0.2) (2022-06-06)
+
+
+### Bug Fixes
+
+* **types:** remove declare global Express.Request ([84c1503](https://github.com/Sagacify/autoroute/commit/84c1503818783e859ca8a10c05025ec7174ff216))
+
 ## [2.0.1](https://github.com/Sagacify/autoroute/compare/v2.0.0...v2.0.1) (2021-10-12)
 
 
